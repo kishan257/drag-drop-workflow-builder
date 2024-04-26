@@ -1,82 +1,119 @@
-// Canvas.js
-import React, { useState, useCallback } from 'react';
-import ReactFlow, { MiniMap, Controls, Background, EdgeRemoveChange, applyNodeChanges } from 'reactflow';
+import React, { useState, useCallback, useMemo } from 'react';
+import ReactFlow, { MiniMap, Controls, Background, applyNodeChanges,applyEdgeChanges, addEdge } from 'reactflow';
 import 'reactflow/dist/style.css';
+import TextInput from './leftPanel/TextInput';
+import DownloadOptions from './leftPanel/DownloadOptions';
+
+const initialNodes = [
+  {
+    id: '1',
+    type: 'input',
+    data: { label: 'Input Node' },
+    position: { x: 250, y: 25 },
+  },
+
+  {
+    id: '2',
+    data: { label: <div>Default Node</div> },
+    position: { x: 100, y: 125 },
+  },
+  {
+    id: '3',
+    type: 'output',
+    data: { label: 'Output Node' },
+    position: { x: 250, y: 250 },
+  },
+];
+
+const initialEdges = [
+  { id: '1-2', source: '1', target: '2' },
+  { id: '2-3', source: '2', target: '3', animated: true },
+];
+
+
+const nodeTypes = {
+  custome: TextInput,
+};
 
 const Canvas = () => {
-  const [elements, setElements] = useState([]);
-  const [selectedNode, setSelectedNode] = useState(null);
 
-  const onElementClick = (_, element) => {
-    setSelectedNode(element);
-  };
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
+  const [textInputs, setTextInputs] = useState([]);
+  // const nodeTypes = useMemo(() => ({ custome: TextInput }), []);
   const onNodesChange = useCallback(
-    (changes) => setElements((nds) => applyNodeChanges(changes, nds)),
-    [setElements]
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [setNodes]
   );
-  const onCanvasClick = () => {
-    setSelectedNode(null);
-  };
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    [setEdges]
+  );
 
-  const addNode = (type, position) => {
+  const addNode = () => {
+    const newNodeId = `node_${nodes.length + 1}`;
     const newNode = {
-      id: type + '_' + Date.now(),
-      type,
-      position,
-      data: { label: type === 'start' ? 'Start' : 'End' },
-      sourcePosition: 'right',
-      targetPosition: 'left',
-      isConnectable: type !== 'start' && type !== 'end', // Prevent start and end nodes from being connected
+      id: newNodeId,
+      type: 'custom',
+      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      data: { label: <TextInput id={newNodeId} onTextChange={handleTextChange} /> },
     };
-
-    setElements((prevElements) => [...prevElements, newNode]);
+    setNodes((prevNodes) => [...prevNodes, newNode]);
+    setTextInputs((prevTextInputs) => [...prevTextInputs, { id: newNodeId, value: '' }]);
   };
-console.log('elements', elements)
-  const onConnect = useCallback(
-    (params) => {
-      setElements((prevElements) => [...prevElements, params]);
-    },
-    []
-  );
 
-  const onDelete = () => {
-    if (!selectedNode || selectedNode.type === 'start' || selectedNode.type === 'end') {
-      return;
-    }
-
-    // setElements((prevElements) => EdgeRemoveChange([selectedNode], prevElements));
-    setSelectedNode(null);
+  const handleTextChange = (id, value) => {
+    setTextInputs((prevTextInputs) =>
+      prevTextInputs.map((textInput) => (textInput.id === id ? { ...textInput, value } : textInput))
+    );
   };
+
+  console.log('elements : nodes', nodes)
+
+  // const onConnect = useCallback(
+  //   (params) => {
+  //     const newEdge = {
+  //       id: `${params.source}-${params.target}`,
+  //       source: params.source,
+  //       target: params.target,
+  //     };
+  
+  //     setEdges((prevEdges) => [...prevEdges, newEdge]);
+  //   },
+  //   [setEdges]
+  // );
 
   return (
-    <div className="w-screen h-screen m-4" onClick={onCanvasClick}>
+    <div className="w-screen h-screen m-4">
       <ReactFlow
-        nodes={elements}
-        onConnect={onConnect}
+        nodes={nodes}
+        edges={edges}
+        elements={nodes.concat(edges)}
+        onConnect={(params) => setEdges((prevEdges) => addEdge(params, prevEdges))}
         onNodesChange={onNodesChange}
-        onElementClick={onElementClick}
-        deleteKeyCode={46}
-        // snapToGrid={true} 
-        // snapGrid={[16, 16]}
+        onEdgesChange={onEdgesChange}
+        // onConnect={onConnect}
+
+        nodeTypes={nodeTypes}
+        snapToGrid={true}
+        snapGrid={[16, 16]}
       >
-        {/* <MiniMap /> */}
+        <MiniMap />
         <Controls />
         <Background />
       </ReactFlow>
 
       <button className=" absolute left-0 bottom-6 bg-green-500 text-white px-4 py-2 rounded" onClick={() => addNode('start', { x: 50, y: 50 })}>
-        Add Start Node
+        Add start Node
       </button>
 
       <button className="absolute left-[150px] bottom-6 bg-red-500 text-white px-4 py-2 rounded" onClick={() => addNode('end', { x: 150, y: 50 })}>
         Add End Node
       </button>
-
-      {selectedNode && (
+      <DownloadOptions data={nodes}/>
+      {nodes && (
         <div className="absolute top-0 right-0 m-4 p-4 bg-white border shadow">
-          {/* Render configuration panel for selected node */}
-          {/* Example: Sort method configuration */}
-          {selectedNode.type === 'sort' && (
+          {nodes.type === 'sort' && (
             <div>
               <h3>Sort Method Configuration</h3>
               <input type="text" placeholder="Column Name" />
@@ -86,8 +123,7 @@ console.log('elements', elements)
               </select>
             </div>
           )}
-          {/* Example: Filter method configuration */}
-          {selectedNode.type === 'filter' && (
+          {nodes.type === 'filter' && (
             <div>
               <h3>Filter Method Configuration</h3>
               <input type="text" placeholder="Column Name" />
@@ -100,7 +136,6 @@ console.log('elements', elements)
               <input type="text" placeholder="Value" />
             </div>
           )}
-          {/* Add configurations for other methods */}
         </div>
       )}
     </div>
