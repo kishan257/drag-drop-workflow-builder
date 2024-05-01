@@ -5,7 +5,8 @@ const CSVDataOptions = ({ onUpload }) => {
   const [csvData, setCsvData] = useState(null);
 
   // Function to handle file upload
-  const handleFileUpload = event => {
+  const handleFileUpload = (event) => {
+    console.log("event.target.files", event.targetSS)
     const file = event.target.files[0];
     const reader = new FileReader();
 
@@ -27,6 +28,7 @@ const CSVDataOptions = ({ onUpload }) => {
     parse(csvData, {
       header: true,
       complete: result => {
+        // console.log('result***********', result)
         onUpload(result.data);
       },
       error: error => {
@@ -34,14 +36,13 @@ const CSVDataOptions = ({ onUpload }) => {
       }
     });
   };
-
   return (
     <div>
       <h3 className="mb-2 font-bold">Choose CSV Data:</h3>
       <input type="file" accept=".csv"
-      // onClick={handleParseCSV}
+      onClick={handleParseCSV}
       />
-      {/* <button onClick={handleParseCSV}>Upload & Parse CSV</button> */}
+      <button onClick={handleParseCSV}>Upload & Parse CSV</button>
     </div>
   );
 };

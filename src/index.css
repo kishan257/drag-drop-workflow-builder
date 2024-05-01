@@ -10,3 +10,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.decisionNode {
+  background: #d5f692;
+  min-width: 82.81px;
+  min-height: 82.81px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
