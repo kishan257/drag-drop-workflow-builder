@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   nodes: [],
   edges: [],
+  data: [],
 };
 
 const workflowSlice = createSlice({
@@ -19,10 +20,13 @@ const workflowSlice = createSlice({
       state.nodes = action.payload.nodes;
       state.edges = action.payload.edges;
     },
+    setCSVData(state, action) {
+      state.data = action.payload;
+    }
   },
 });
 
-export const { addNode, addEdge, saveWorkflow } = workflowSlice.actions;
+export const { addNode, addEdge, saveWorkflow, setCSVData } = workflowSlice.actions;
 
 export default workflowSlice.reducer;
     

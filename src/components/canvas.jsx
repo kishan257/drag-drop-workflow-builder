@@ -122,23 +122,6 @@ const Canvas = () => {
           <Background />
         </ReactFlow>
 
-        {/*ignore design style */}
-        <button className="absolute left-0 bottom-6 bg-green-500 text-white px-4 py-2 m-1 rounded" onClick={() => addNode('start', { x: 50, y: 50 })}>
-          Add start Node
-        </button>
-        <button className="absolute left-0 bottom-[120px] bg-green-500 text-white px-4 py-2 m-1 rounded" onClick={() => addDecisionNode('start', { x: 50, y: 50 })}>
-          Decision
-        </button>
-        <button className="absolute left-[150px] bottom-6 bg-red-500 m-1 text-white px-4 py-2 rounded" onClick={() => addNode('end', { x: 150, y: 50 })}>
-          Add End Node
-        </button>
-        <DownloadOptions data={nodes} />
-        <div className='absolute top-0 right-[270px] z-50 bg-indigo-400 text-white p-2 rounded m-2'>
-          <button onClick={handleResetBtn}>clear</button>
-        </div>
-        <div className='absolute top-0 right-0 z-50 bg-indigo-400 text-white p-2 rounded m-2'>
-          <CanvasDownload flowchartRef={flowchartRef} />
-        </div>
         {nodes && (
           <div className="absolute top-0 right-0 m-4 p-4 bg-white border shadow">
             {nodes.type === 'sort' && (
@@ -167,6 +150,23 @@ const Canvas = () => {
           </div>
         )}
       </div>
+        {/*ignore design style */}
+        <button className="absolute left-0 bottom-6 bg-green-500 text-white px-4 py-2 m-1 rounded" onClick={() => addNode('start', { x: 50, y: 50 })}>
+          Add start Node
+        </button>
+        <button className="absolute left-0 bottom-[120px] bg-green-500 text-white px-4 py-2 m-1 rounded" onClick={() => addDecisionNode('start', { x: 50, y: 50 })}>
+          Decision
+        </button>
+        <button className="absolute left-[150px] bottom-6 bg-red-500 m-1 text-white px-4 py-2 rounded" onClick={() => addNode('end', { x: 150, y: 50 })}>
+          Add End Node
+        </button>
+        <DownloadOptions data={nodes} />
+        <div className='absolute top-0 right-[270px] z-50 bg-indigo-400 text-white p-2 rounded m-2'>
+          <button onClick={handleResetBtn}>clear</button>
+        </div>
+        <div className='absolute top-0 right-0 z-50 bg-indigo-400 text-white p-2 rounded m-2'>
+          <CanvasDownload flowchartRef={flowchartRef} />
+        </div>
     </>
 
   );
